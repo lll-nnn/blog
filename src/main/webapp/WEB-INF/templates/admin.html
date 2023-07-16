@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="include/header :: head(~{}, ~{}, ~{})"></div>
+<div th:replace="include/navbar-admin :: header"></div>
+<style>
+    .center-in-center{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+</style>
+<body>
+<div class="center-in-center">
+    <span style="font-size: 35px;">欢迎来到管理后台</span>
+</div>
+</body>
+</html>

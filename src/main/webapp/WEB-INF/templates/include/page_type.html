@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<!-- 分页 -->
+<nav th:fragment="page(pager)" aria-label="Page navigation example">
+    <ul class="pagination justify-content-end page-box">
+        <li th:class="${'page-item' + (pager.isFirstPage ? ' disabled' : '')}" class="page-item disabled">
+            <a th:aria-disabled="${pager.isFirstPage ? 'true' : ''}"
+               th:href="@{'/type/' + ${typeSelected} + '/p/' + ${pager.prePage}}"
+               class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+        </li>
+        <li th:if="${pager.pageNum > 3}" class="page-item">
+            <a th:href="@{'/type/' + ${typeSelected} + '/p/1'}" class="page-link" href="#">1</a>
+        </li>
+        <li th:if="${pager.pageNum > 3}" class="page-item disabled">
+            <a class="page-link" href="#">...</a>
+        </li>
+
+        <li th:each="page : ${pager.navigatepageNums}"
+            th:class="${'page-item ' + page == pager.pageNum ? 'active' : ''}"
+            th:aria-current="${page == pager.pageNum ? 'page' : ''}"
+            class="page-item">
+            <a th:if="${page != pager.pageNum}"
+               th:text="${page}"
+               th:href="@{'/type/' + ${typeSelected} + '/p/' + ${page}}"
+               class="page-link" href="#">1</a>
+            <span th:if="${page == pager.pageNum}"
+                  th:text="${page}"
+                  class="page-link current-page">
+                </span>
+        </li>
+
+        <li th:if="${pager.pages - pager.pageNum > 3}" class="page-item disabled">
+            <a class="page-link" href="#">...</a>
+        </li>
+        <li th:if="${pager.pages - pager.pageNum > 3}" class="page-item">
+            <a th:text="${pager.pages}" th:href="@{'/type/' + ${typeSelected} + '/p/' + ${pager.pages}}" class="page-link" href="#">1</a>
+        </li>
+        <li th:class="${'page-item' + (pager.isLastPage ? ' disabled' : '')}" class="page-item disabled">
+            <a th:aria-disabled="${pager.isLastPage ? 'true' : ''}"
+               th:href="@{'/type/' + ${typeSelected} + '/p/' + ${pager.nextPage}}"
+               class="page-link" href="#">&raquo;</a>
+        </li>
+    </ul>
+</nav>
+
+</html>

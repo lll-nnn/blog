@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Article Editor</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/toastr.js/1.3.1/css/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/static/editor_md/css/editormd.css}">
+
+
+
+</head>
+<body>
+<input type="hidden" id="articleId" th:value="${article.id}">
+<div class="row">
+    <a class="btn btn-success btn-lg col-lg-2" th:href="@{/}">返回首页</a>
+    <label for="title" class="col-lg-1" style="font-size: 30px;">标题：</label>
+    <input id="title" name="title" th:value="${article.title}" type="text" class="form-control input-lg col-lg-9" placeholder="这里输入文章标题"/>
+</div>
+
+<div id="layout">
+    <div id="test-editormd">
+        <textarea th:text="${article.markdownContent}" style="display:none;">#### Editor.md
+</textarea>
+    </div>
+</div>
+
+<div class="row">
+    <label for="tagGroup"></label><select class="form-control col-md-1" id="tagGroup" placeholder="选择所属分类">
+    <Option th:each="type : ${types}"
+            th:value="${type}"
+            th:text="${type}"
+            th:selected="${type}==${articleType}">分类</Option>
+</select>
+    <Select id="tag1" class="form-control col-md-1"
+            placeholder="选择标签">
+        <Option th:each="tag : ${tags}"
+                th:value="${tag.name}"
+                th:text="${tag.name}"
+                th:selected="${tag.name}==${tag1}">分类</Option>
+    </Select>
+    <Select id="tag2" class="form-control col-md-1"
+            placeholder="选择标签">
+        <Option th:each="tag : ${tags}"
+                th:value="${tag.name}"
+                th:text="${tag.name}"
+                th:selected="${tag.name}==${tag2}">分类</Option>
+    </Select>
+    <Select id="tag3" class="form-control col-md-1"
+            placeholder="选择标签">
+        <Option th:each="tag : ${tags}"
+                th:value="${tag.name}"
+                th:text="${tag.name}"
+                th:selected="${tag.name}==${tag3}">分类</Option>
+    </Select>
+    <div class="col-md-1">
+        <Button class="btn btn-success" id="submitArticle">保存</Button>
+    </div>
+</div>
+
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/toastr.js/1.3.1/js/toastr.min.js"></script>
+<script th:src="@{/static/js/editormd.js}"></script>
+<script type="text/javascript">
+    var testEditor;
+    var post = function (path, data, callback) {
+        $.ajax({
+            method: 'POST',
+            url: path,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (data) {
+                if (!data.success) {
+                    toastr.error(data.message);
+                } else if (callback) {
+                    callback(data.data);
+                }
+            }
+        });
+    };
+
+    $(function() {
+        testEditor = editormd("test-editormd", {
+            width   : "100%",
+            height  : 640,
+            syncScrolling : "single",
+            path    : "../../../classwork/static/editor_md/lib/",
+            saveHTMLToTextarea : true,    // 保存 HTML 到 Textarea
+            searchReplace : true,
+            emoji : true,
+            taskList : true,
+            tex : true,                   // 开启科学公式TeX语言支持，默认关闭
+            flowChart : true,             // 开启流程图支持，默认关闭
+            sequenceDiagram : true,       // 开启时序/序列图支持，默认关闭,
+        });
+        $("#submitArticle").on("click", function (){
+            var title = $("#title").val()
+            if (!title){
+                toastr.error("标题不能为空");
+                return;
+            }
+            if (title.length > 40) {
+                toastr.error('标题不能超过40个字符');
+                return;
+            }
+            var markdown = testEditor.getMarkdown()
+            if(!markdown){
+                toastr.error("内容不能为空");
+                return;
+            }
+            var html = testEditor.getHTML()
+            var tagGroup = $("#tagGroup option:selected").text()
+            var tag1 = $("#tag1 option:selected").text()
+            var tag2 = $("#tag2 option:selected").val()
+            var tag3 = $("#tag3").val()
+            var articleId = $("#articleId").val()
+
+            post("/classwork/article/update", {
+                'title':title,
+                'markdownContent':markdown,
+                'htmlContent':html,
+                'tagGroup':tagGroup,
+                'tag1':tag1,
+                'tag2':tag2,
+                'tag3':tag3,
+                'articleId':articleId
+            }, function (data){
+                toastr.success("保存成功");
+                setTimeout(function (){
+                    window.location.replace("/classwork")
+                }, 500)
+            })
+            // $.post("/classwork/article/save", {
+            //     'title':title,
+            //     'markdown':markdown,
+            //     'html':html,
+            //     'tagGroup':tagGroup,
+            //     'tag1':tag1,
+            //     'tag2':tag2,
+            //     'tag3':tag3,
+            // },function (data, status){
+            //     if(status === "success"){
+            //         toastr.success('发表成功');
+            //         setTimeout(function (){
+            //             window.location.replace("/classwork")
+            //         }, 500)
+            //
+            //     }else{
+            //         toastr.error("提交失败");
+            //     }
+            // })
+        })
+    });
+
+</script>
+</body>
+</html>
